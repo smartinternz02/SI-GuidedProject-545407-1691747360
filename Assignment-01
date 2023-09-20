@@ -1,0 +1,119 @@
+#Importing necessary libraries
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+import seaborn as sns
+
+#Importing and Loading the dataset
+# Reading anime.csv
+anime = pd.read_csv("anime.csv")
+
+# Displaying the number of rows and columns in the dataset
+anime.shape
+
+# Display the first five instances of the datset
+anime.head()
+
+# Reading the rating.csv
+rating = pd.read_csv("rating.csv")
+
+# Displaying the numbers of rows and columns in the dataset
+rating.shape
+
+# Displaying the first five instances of the dataset
+rating.head()
+
+#Exploratory Data Analysis
+# Handling null values in anime.csv
+anime.isnull().sum()
+
+# Removing the null values from the dataset
+anime = anime.dropna()
+
+# Checking if the null values are removed
+anime.isnull().sum()
+
+# Checking for null values in rating.csv file
+rating.isnull().sum()
+
+# Filtering out the required columns from anime.csv
+selected_cols = ['anime_id', 'name', 'genre','rating', 'members']
+
+# Displaying the first few instances of the new dataset
+anime[selected_cols].head()
+
+#Visualizing the Dataset
+# Create a DataFrame
+anime_df = pd.DataFrame(anime)
+
+# Set the figure size
+plt.figure(figsize=(12, 6))
+
+# Bar Chart for Ratings
+plt.subplot(2, 2, 1)
+sns.barplot(x='name', y='rating', data=anime_df)
+plt.xticks(rotation=15)
+plt.title('Anime Ratings')
+
+# Bar Chart for Genre Counts
+plt.subplot(2, 2, 2)
+genre_counts = anime_df['genre'].str.split(', ').explode().value_counts()
+sns.barplot(x=genre_counts.values, y=genre_counts.index, orient='h')
+plt.title('Genre Counts')
+
+# Scatter Plot for Ratings vs. Members
+plt.subplot(2, 2, 3)
+sns.scatterplot(x='rating', y='members', data=anime_df)
+plt.title('Ratings vs. Members')
+
+# Histogram for Rating Distribution
+plt.subplot(2, 2, 4)
+sns.histplot(anime_df['rating'], bins=10, kde=True)
+plt.title('Rating Distribution')
+
+plt.tight_layout()
+plt.show()
+
+# Pie Chart for Genre Distribution
+plt.figure(figsize=(8, 8))
+genre_counts.plot(kind='pie', autopct='%1.1f%%')
+plt.title('Genre Distribution')
+plt.ylabel('')
+plt.show()
+
+#Data Pre-processing
+# Merging anime.csv and ratings.csv using anime_id
+merged_df = pd.merge(anime, rating, on='anime_id', how='inner')
+
+# Displaying the first five instances of the merged dataset
+merged_df.head()
+
+# Checking for null values
+merged_df.isnull().sum()
+
+# Filtering out the required columns from the given dataset
+new_df = pd.DataFrame(merged_df)
+
+# Specify the columns you want to keep
+columns_to_keep = ['user_id','name','anime_id', 'genre','rating_y']
+
+# Displaying the first few instances of the new dataset
+new_df[columns_to_keep].head()
+
+# Checking the datatype of the values in the dataset
+new_df.dtypes
+
+#Label Encoding
+df = pd.DataFrame(new_df)
+
+# Initialize LabelEncoder
+label_encoder = LabelEncoder()
+
+# Apply label encoding to relevant columns
+columns_to_encode = ['anime_id', 'name', 'genre', 'rating_y']
+for column in columns_to_encode:
+    df[column] = label_encoder.fit_transform(df[column])
+
+# Display the first few instances of the updated dataset
+df.head()
